@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+# import sys 
+# sys.path.append(r"C:/Users/rjavi/Documentos/EXACTAS/ALC-2c2025/Laboratorio/L00 - Numpy y Matrices")
+# import librerias
 
 def pointsGrid(esquinas):
     # crear 10 lineas horizontales
@@ -16,14 +19,19 @@ def pointsGrid(esquinas):
                          
     return wz
 
-def proyectarPts(T, wz):
+def proyectarPts(T, wz): #es lo mismo que hacer T@wz(pero codeado a bajo nivel)
     assert(T.shape == (2,2)) # chequeo de matriz 2x2
     assert(T.shape[1] == wz.shape[0]) # multiplicacion matricial valida   
     xy = None
-    ############### Insert code here!! ######################3    
-
-    ############### Insert code here!! ######################3
-    return xy
+    res = np.zeros((T.shape[0],wz.shape[1]))  
+    for filaDeT in range(T.shape[0]):
+        for columnaDeWz in range(wz.shape[1]):
+            suma = 0
+            for filaDeWz in range(wz.shape[0]):
+                suma = suma + T[filaDeT,filaDeWz]*wz[filaDeWz,columnaDeWz]
+            res[filaDeT,columnaDeWz] = suma
+    xy = res
+    return xy  # producto entre 2 matrices
           
 def vistform(T, wz, titulo=''):
     # transformar los puntos de entrada usando T
