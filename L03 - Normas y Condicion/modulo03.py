@@ -19,3 +19,17 @@ def norma(x,p):
     else:
         raise ValueError("p debe ser 1, 2 o np.inf")
     
+def normaliza(X, p):
+    """
+    Recibe, una lista de vectores no vacio, y un escalar p.
+    Devuelve una lista donde cada elemento corresponde a normalizar los elementos de X con la norma p.
+    """
+    for i in range(len(X)):
+        X[i] = X[i]/norma(X[i],p)
+    return X
+
+def normaMatMC(A,q,p,Np):
+    """
+    Devuelve la norma  ||A||{q , p} y el vector x en el cual se alcanza
+    el maximo """
+    
