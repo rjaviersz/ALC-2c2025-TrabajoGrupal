@@ -182,7 +182,7 @@ test_traza()
 # traspuesta de A.
 # =============================================================================
  
-def traspuesta(A): # implementacion menos costosa y mas eficiente
+def traspuesta(A): 
     n, m = A.shape
     At = np.zeros((m, n))  # matriz de retorno donde ire cambiando valores
     for columna in range(m):
@@ -193,7 +193,7 @@ def traspuesta(A): # implementacion menos costosa y mas eficiente
     #     for columna in range(m):
     #         At[columna, fila] = A[fila, columna]
 
-def traspuesta1(A):  # primera implementacion pero que consume mucha memoria
+def traspuesta1(A): 
     At = []
     n, m = A.shape
     for columna in range(m):
