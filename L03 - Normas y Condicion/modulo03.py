@@ -29,7 +29,43 @@ def normaliza(X, p):
         X[i] = X[i]/norma(X[i],p)
     return X
 
-def normaMatMC(A,q,p,Np):
+def normaMatMC(A, q, p, Np):  """funciona nueva version""" 
+    """
+    Devuelve la norma ||A||_{q,p} y el vector x en el cual se alcanza el maximo.
+    Esta versión es para pasar las pruebas de laboratorio.
+    """
+    # La matriz A tiene un tamaño de n filas y m columnas, es decir (n x m).
+    
+    # Genera Np vectores aleatorios. Cada vector tiene m componentes.
+    # El resultado es una matriz de (Np x m).
+    vectores_aleatorios = np.random.standard_normal(size=(Np, A.shape[1]))
+    
+    # Normaliza cada uno de los Np vectores con la norma 'p'.
+    # La dimensión de la matriz de vectores normalizados se mantiene en (Np x m).
+    vectores_normalizados = normaliza(vectores_aleatorios, p)
+    
+    max_norma = 0
+    max_vector = None
+    
+    for i in range(Np):
+        # Selecciona el i-ésimo vector de la matriz de vectores normalizados.
+        # Este vector 'y' tiene m componentes.
+        y = vectores_normalizados[i]  
+        
+        # Aplica la matriz A al vector y.
+        # La multiplicación A @ y es (n x m) @ (m x 1), que resulta en un vector (n x 1).
+        vector_resultante = np.dot(A,y)
+        
+        # Calcula la norma 'q' del vector resultante.
+        norma_actual = norma(vector_resultante, q)
+        
+        if norma_actual > max_norma:
+            max_norma = norma_actual
+            max_vector = y
+
+    return max_norma, max_vector
+
+def normaMatMC1(A,q,p,Np):  """falla con varias pruebas"""
     """
     Devuelve la norma  ||A||{q , p} y el vector x en el cual se alcanza
     el maximo """
