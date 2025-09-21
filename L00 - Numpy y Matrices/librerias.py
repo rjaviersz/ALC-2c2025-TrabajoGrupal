@@ -90,6 +90,31 @@ def test_triangSup():
 # Ejecutar tests
 test_triangSup()
 
+def triangSupDiag(A):
+    U = A.copy()
+    n,m = U.shape 
+    j = 0
+    for fila in U:
+        i = 0
+        while i < j and i < m:
+            fila[i] = 0
+            i = i + 1
+        j = j + 1
+    return U 
+    
+# === TESTS AUTOMÁTICOS ===
+def test_triangSupDiag():
+    sizes = [(3,3), (3,4), (4,2), (5,5), (2,5), (6,3)]  # cuadradas, n<m y n>m
+    for n, m in sizes:
+        A = np.random.randint(1,10,(n,m))
+        result = triangSupDiag(A)
+        expected = np.triu(A, k=0)  # incluye la diagonal
+        assert np.array_equal(result, expected), f"Fallo en tamaño {n}x{m}"
+    print("✅ 2) Todos los tests pasaron correctamente.")
+
+# Ejecutar tests
+test_triangSupDiag()
+
 
 # =============================================================================
 # Ejercicio 3. Desarrollar una funcion triangInf(A) que devuelva la matriz L
@@ -120,6 +145,36 @@ def test_triangInf():
 
 # Ejecutar tests
 test_triangInf()
+
+def triangInfCon1s(A):
+    L = A.copy()
+    n,m = L.shape 
+    j = 0
+    for fila in L:
+        i = j
+        while j<m and i<m :
+            fila[i] = 0
+            i = i+1
+            fila[j] = 1   
+        j = j + 1
+    return L 
+
+# === TESTS AUTOMÁTICOS ===
+def test_triangInfCon1s():
+    sizes = [(3,3), (3,4), (4,2), (5,5), (2,5), (6,3)]  # cuadradas, n<m y n>m
+    for n, m in sizes:
+        A = np.random.randint(1,10,(n,m))
+        result = triangInfCon1s(A)
+
+        # Matriz esperada: triangular inferior con 1s en la diagonal
+        expected = np.tril(A, k=-1)   # parte estrictamente inferior de A
+        expected = expected + np.eye(n, m, dtype=int)  # unos en la diagonal
+
+        assert np.array_equal(result, expected), f"Fallo en tamaño {n}x{m}"
+    print("✅ 3) Todos los tests pasaron correctamente.")
+
+# Ejecutar tests
+test_triangInfCon1s()
 
 # =============================================================================
 #  Ejercicio 4. Desarrollar una funcioon diagonal(A) que devuelva la matriz D

@@ -29,7 +29,8 @@ def normaliza(X, p):
         X[i] = X[i]/norma(X[i],p)
     return X
 
-def normaMatMC(A, q, p, Np):  """funciona nueva version""" 
+def normaMatMC(A, q, p, Np):
+    """funciona nueva version""" 
     """
     Devuelve la norma ||A||_{q,p} y el vector x en el cual se alcanza el maximo.
     Esta versión es para pasar las pruebas de laboratorio.
@@ -65,7 +66,8 @@ def normaMatMC(A, q, p, Np):  """funciona nueva version"""
 
     return max_norma, max_vector
 
-def normaMatMC1(A,q,p,Np):  """falla con varias pruebas"""
+def normaMatMC1(A,q,p,Np):  
+    """falla con varias pruebas"""
     """
     Devuelve la norma  ||A||{q , p} y el vector x en el cual se alcanza
     el maximo """

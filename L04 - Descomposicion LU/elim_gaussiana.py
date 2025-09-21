@@ -17,16 +17,48 @@ def elim_gaussiana(A):
     
     ## desde aqui -- CODIGO A COMPLETAR
 
-
-
-
-
-                
+    for k in range(n-1): # aca ire viendo si los aii menos el ultimo, son != 0
+        pivot = Ac[k,k] 
+        if pivot != 0:
+            for i in range(k+1, m): # con esto me muevo por las filas
+                alfa = Ac[i,k] / pivot
+                Ac[i,k] = alfa  # voy armando L in-place
+                cant_op = cant_op + 1
+                for j in range(k+1,n): # con esto me muevo por las columnas
+                    Ac[i,j] = Ac[i,j] - alfa*Ac[k,j]
+                    cant_op = cant_op + 2
+            
     ## hasta aqui, calculando L, U y la cantidad de operaciones sobre 
     ## la matriz Ac
-            
-    
+    L = triangInfCon1s(Ac)
+    U = triangSupDiag(Ac)      
+          
     return L, U, cant_op
+
+def triangSupDiag(A):  # funcion auxiliar
+    U = A.copy()
+    n,m = U.shape 
+    j = 0
+    for fila in U:
+        i = 0
+        while i < j and i < m:
+            fila[i] = 0
+            i = i + 1
+        j = j + 1
+    return U 
+
+def triangInfCon1s(A):
+    L = A.copy()
+    n,m = L.shape 
+    j = 0
+    for fila in L:
+        i = j
+        while j<m and i<m :
+            fila[i] = 0
+            i = i+1 
+            fila[j] = 1
+        j = j + 1
+    return L 
 
 
 def main():
