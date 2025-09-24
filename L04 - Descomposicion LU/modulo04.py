@@ -66,6 +66,28 @@ def res_tri(L, b, inferior=True):
     si es triangular inferior o superior usando el argumento
     'inferior' (por default se asume que es triangular inferior).
     """
+    n = L.shape[0]
+    y = np.zeros(n)
+    if inferior:
+        for i in range(n): # Sustitución hacia adelante
+            suma= 0.0
+            for j in range(i):
+                coef = L[i, j]
+                sol_ant = y[j]
+                suma += coef * sol_ant
+            pivote = L[i, i]
+            y[i] = (b[i] - suma) / pivote
+    else: # Sustitución hacia atrás
+        for i in range(n - 1, -1, -1):      
+            # El valor a despejar es y[i]. Para eso, a b[i] le restamos los términos q conocemos
+            suma = 0.0   
+            for j in range(i + 1, n):
+                coef = L[i, j]
+                sol_post = y[j] # Usamos las soluciones que ya calculamos
+                suma += coef * sol_post           
+            pivote = L[i, i]
+            y[i] = (b[i] - suma) / pivote
+    return y
 
 def inversa(A):
     """
