@@ -1,4 +1,28 @@
+import numpy as np
+
+# BORRAR AL JUNTAR LOS MODULOS
+def norma(x,p):
+    """
+    Calcula la norma p del vector x sin np.linalg.norm
+    """
+    x = np.array(x)
+    if p == 1:
+        for i in range(len(x)):
+            x[i] = abs(x[i])
+        return sum(x)
+    elif p == 2:
+        for i in range(len(x)):
+            x[i] = x[i]**2
+        return np.sqrt(sum(x))
+    elif p == "inf":
+        for i in range(len(x)):
+            x[i] = abs(x[i])
+        return max(x)
+    else:
+        raise ValueError("p debe ser 1, 2 o np.inf")
+    
 ### Funciones L05-QR
+
 def QR_con_GS(A,tol=1e-12,retorna_nops=False):
     """
     A una matriz de n x n 
@@ -7,6 +31,39 @@ def QR_con_GS(A,tol=1e-12,retorna_nops=False):
     retorna matrices Q y R calculadas con Gram Schmidt (y como tercer argumento opcional, el numero de operaciones).
     Si la matriz A no es de n x n, debe retornar None
     """
+    n,m = A.shape
+    
+    if n != m: # Si A no es cuadrada devuelve None
+        return None
+    
+    # Creo matriz cuadrada de ceros para Q y R
+    Q = np.zeros((n,n))
+    R = np.zeros((n,n))
+    Qprima = np.zeros((n,n)) # Matriz Q antes de normalizar las columnas
+    nops = 0 # Contador de operaciones
+
+    Q[:,0] = A[:,0] / norma(A[:,0],2) # Primera columna de Q
+    R[0,0] = norma(A[:,0],2) # Primer elemento de R
+    
+    
+    for j in range(1,n): # Recorro columnas de A (y Q y R)
+        Qprima[:,j] = A[:,j] # Copia cada columna de A a Qprima
+        nops += n # Sumo 1 al numero de operaciones por copiar una columna
+
+        for i in range(0,j): # Recorro columnas anteriores de Q
+            R[i,j] = sum(Q[:,i] * Qprima[:,j]) # Calculo R[i,j]
+            nops += 2*n - 1 # Operaciones del producto escalar
+            Qprima[:,j] = Qprima[:,j] - R[i,j] * Q[:,i] # Actualizo Qprima
+            nops += 2*n # Operaciones de la resta y multiplicacion por escalar
+        
+        R[j,j] = norma(Qprima[:,j],2) # Calculo R[j,j]
+        nops += 2*n - 1 # Operaciones de la norma
+        Q[:,j] = Qprima[:,j] / R[j,j] # Normalizo Qprima para obtener Q
+        nops += n # Operaciones de la division por escalar
+
+    if retorna_nops:
+        return Q, R, nops
+    return Q, R
 
 def QR_con_HH(A,tol=1e-12):
     """
@@ -25,8 +82,6 @@ def calculaQR(A,metodo='RH',tol=1e-12):
     """
 
 # Tests L05-QR:
-
-import numpy as np
 
 # --- Matrices de prueba ---
 A2 = np.array([[1., 2.],
