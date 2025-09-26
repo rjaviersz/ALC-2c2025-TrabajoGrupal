@@ -73,7 +73,7 @@ def inversa(A):
     n = A.shape[0]
     L, U, _ = calculaLU(A)  
     Id = np.eye(n)
-    if (L is None) or (U is None) or detMatrizTriangular(U)==0  :
+    if L is None or detMatrizTriangular(U)==0  :
         return None  
     # Uso que LU.(A^-1) = Id
     for i in range(n):
