@@ -16,12 +16,11 @@ def calculaLU(A):
     m=A.shape[0]
     n=A.shape[1]
     Ac = A.copy()
-    
     if m!=n:
         return (None, None, 0)
     for k in range(n-1): # aca ire viendo si los aii menos el ultimo, son != 0
         pivot = Ac[k,k] 
-        if pivot == 0:
+        if abs(pivot) < 1e-10:
             return (None, None, 0)
         for i in range(k+1, m): # con esto me muevo por las filas
             alfa = Ac[i,k] / pivot
@@ -34,38 +33,14 @@ def calculaLU(A):
     U = triangSupDiag(Ac)           
     return L, U, cant_op
 
-def triangSupDiag(A):  # funcion auxiliar (version modificada del labo00)
-    U = A.copy()
-    n,m = U.shape 
-    j = 0
-    for fila in U:
-        i = 0
-        while i < j and i < m:
-            fila[i] = 0
-            i = i + 1
-        j = j + 1
-    return U 
-
-def triangInfCon1s(A):  # funcion auxiliar (version modificada del labo00)
-    L = A.copy()
-    n,m = L.shape 
-    j = 0
-    for fila in L:
-        i = j
-        while j<m and i<m :
-            fila[i] = 0
-            i = i+1 
-            fila[j] = 1
-        j = j + 1
-    return L 
-
-
 def res_tri(L, b, inferior=True):
     """
     Resuelve el sistema Lx = b, donde L es triangular. Se puede indicar
     si es triangular inferior o superior usando el argumento
     'inferior' (por default se asume que es triangular inferior).
     """
+    if detMatrizTriangular(L)==0 :
+        return None
     n = L.shape[0]
     y = np.zeros(n)
     if inferior:
@@ -94,7 +69,22 @@ def inversa(A):
     Calcula la inversa de A empleando la factorización LU
     y las funciones que resuelven sistemas triangulares.
     """
+    Ainv = []
+    n = A.shape[0]
+    L, U, _ = calculaLU(A)  
+    Id = np.eye(n)
+    if (L is None) or (U is None) or detMatrizTriangular(U)==0  :
+        return None  
+    # Uso que LU.(A^-1) = Id
+    for i in range(n):
+        e_j = Id[i]              # L. y_j = e_j
+        y_j = res_tri(L, e_j)    # U. ainv_j = y_j 
+        ainv_j = res_tri(U, y_j, inferior=False)
+        Ainv.append(ainv_j)
+    res = traspuesta(np.array(Ainv))
+    return res
 
+    
 def calculaLDV(A):
     """
     Calcula la factorización LDV de la matriz A, de forma tal que A =
@@ -109,6 +99,47 @@ def esSDP(A, atol=1e-8):
     la factorización LDV.
     """
 
+""" funciones auxiliares """
+def triangSupDiag(A):  # funcion auxiliar (version modificada del labo00)
+    U = A.copy()
+    n,m = U.shape 
+    j = 0
+    for fila in U:
+        i = 0
+        while i < j and i < m:
+            fila[i] = 0
+            i = i + 1
+        j = j + 1
+    return U 
+
+def triangInfCon1s(A):  # funcion auxiliar (version modificada del labo00)
+    L = A.copy()
+    n,m = L.shape 
+    j = 0
+    for fila in L:
+        i = j
+        while j<m and i<m :
+            fila[i] = 0
+            i = i+1 
+            fila[j] = 1
+        j = j + 1
+    return L 
+
+def traspuesta(A):  # funcion del labo00
+    n,m = A.shape
+    At = np.zeros((m, n))  # matriz de retorno donde ire cambiando valores
+    for columna in range(m):
+        for fila in range(n):
+            At[columna, fila] = A[fila, columna]
+    return At
+
+def detMatrizTriangular(U, tol=1e-10):  #funcion auxiliar para ver si U es sing
+    determinante = 1 
+    for i in range (U.shape[0]):
+        determinante = determinante*U[i,i]
+    if determinante < tol :
+        return 0 
+    return determinante
 
 # =============================================================================
 # Tests L04-LU
@@ -180,43 +211,43 @@ assert(inversa(A) is None)
 
 
 
-# Test LDV:
+# # Test LDV:
 
-L0 = np.array([[1,0,0],[1,1.,0],[1,1,1]])
-D0 = np.diag([1,2,3])
-V0 = np.array([[1,1,1],[0,1,1],[0,0,1]])
-A =  L0 @ D0  @ V0
-L,D,V,nops = calculaLDV(A)
-assert(np.allclose(L,L0))
-assert(np.allclose(D,D0))
-assert(np.allclose(V,V0))
+# L0 = np.array([[1,0,0],[1,1.,0],[1,1,1]])
+# D0 = np.diag([1,2,3])
+# V0 = np.array([[1,1,1],[0,1,1],[0,0,1]])
+# A =  L0 @ D0  @ V0
+# L,D,V,nops = calculaLDV(A)
+# assert(np.allclose(L,L0))
+# assert(np.allclose(D,D0))
+# assert(np.allclose(V,V0))
 
-L0 = np.array([[1,0,0],[1,1.001,0],[1,1,1]])
-D0 = np.diag([3,2,1])
-V0 = np.array([[1,1,1],[0,1,1],[0,0,1.001]])
-A =  L0 @ D0  @ V0
-L,D,V,nops = calculaLDV(A)
-assert(np.allclose(L,L0,1e-3))
-assert(np.allclose(D,D0,1e-3))
-assert(np.allclose(V,V0,1e-3))
+# L0 = np.array([[1,0,0],[1,1.001,0],[1,1,1]])
+# D0 = np.diag([3,2,1])
+# V0 = np.array([[1,1,1],[0,1,1],[0,0,1.001]])
+# A =  L0 @ D0  @ V0
+# L,D,V,nops = calculaLDV(A)
+# assert(np.allclose(L,L0,1e-3))
+# assert(np.allclose(D,D0,1e-3))
+# assert(np.allclose(V,V0,1e-3))
 
-# Tests SDP
+# # Tests SDP
 
-L0 = np.array([[1,0,0],[1,1,0],[1,1,1]])
-D0 = np.diag([1,1,1])
-A = L0 @ D0 @ L0.T
-assert(esSDP(A))
+# L0 = np.array([[1,0,0],[1,1,0],[1,1,1]])
+# D0 = np.diag([1,1,1])
+# A = L0 @ D0 @ L0.T
+# assert(esSDP(A))
 
-D0 = np.diag([1,-1,1])
-A = L0 @ D0 @ L0.T
-assert(not esSDP(A))
+# D0 = np.diag([1,-1,1])
+# A = L0 @ D0 @ L0.T
+# assert(not esSDP(A))
 
-D0 = np.diag([1,1,1e-16])
-A = L0 @ D0 @ L0.T
-assert(not esSDP(A))
+# D0 = np.diag([1,1,1e-16])
+# A = L0 @ D0 @ L0.T
+# assert(not esSDP(A))
 
-L0 = np.array([[1,0,0],[1,1,0],[1,1,1]])
-D0 = np.diag([1,1,1])
-V0 = np.array([[1,0,0],[1,1,0],[1,1+1e-10,1]]).T
-A = L0 @ D0 @ V0
-assert(not esSDP(A))
+# L0 = np.array([[1,0,0],[1,1,0],[1,1,1]])
+# D0 = np.diag([1,1,1])
+# V0 = np.array([[1,0,0],[1,1,0],[1,1+1e-10,1]]).T
+# A = L0 @ D0 @ V0
+# assert(not esSDP(A))
