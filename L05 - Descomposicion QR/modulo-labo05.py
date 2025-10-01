@@ -118,8 +118,6 @@ def calcula_M (escalar, v, w):
             for i in range (m):
                 matriz_res[i,j]=v[i]*w[j]*escalar
         return matriz_res
-import numpy as np
-
 
 
 def suma_vectorial(x):
@@ -135,10 +133,9 @@ def suma_vectorial(x):
     return acumulador
 
 def norma_2_sin_modificar(x):
-
     norma_sq = suma_vectorial(x**2)
-    
     return np.sqrt(norma_sq)
+
 def calcula_v_beta(x):
     """
     Calcula el vector de Householder (v) y el escalar beta.
@@ -192,11 +189,13 @@ def construye_H_k(v_sub, beta, m, k):
     
     return H_k
 
-# =================================================================
-#                 FUNCIÓN PRINCIPAL: QR_con_HH
-# =================================================================
-
 def QR_con_HH(A, tol=1e-12):
+    """
+    A una matriz de m x n (m>=n)
+    tol la tolerancia con la que se filtran elementos nulos en R
+    retorna matrices Q y R calculadas con reflexiones de Householder
+    Si la matriz A no cumple m>=n, debe retornar None
+    """
     #A (de n*m ), Q (de m*m) R(de m*n)--> QR=A
     A = np.copy(A) 
     m, n = A.shape 
@@ -229,7 +228,7 @@ def QR_con_HH(A, tol=1e-12):
             # M = beta * v * w
             M = calcula_M(beta, v_sub, w)
             
-            # Actualizar R_sub in situ: R_sub = R_sub - M
+            # Actualizar R_sub in place: R_sub = R_sub - M
             A[k:, k:] -= M
         
     # R es la matriz A modificada. Aplicar tolerancia final.
@@ -259,6 +258,20 @@ def calculaQR(A,metodo='RH',tol=1e-12):
     retorna matrices Q y R calculadas con Gram Schmidt (y como tercer argumento opcional, el numero de operaciones)
     Si el metodo no esta entre las opciones, retorna None
     """
+    metodo = metodo.upper()
+    
+    if metodo == 'RH':
+        # Retorna Q y R calculadas con Householder
+        # La función QR_con_HH no tiene un contador de operaciones
+        return QR_con_HH(A, tol)
+    
+    elif metodo == 'GS':
+        return QR_con_GS(A, tol)
+    
+    else:
+        # Si el método no es 'RH' ni 'GS'
+        return None
+
 
 # Tests L05-QR:
 
@@ -300,3 +313,12 @@ check_QR(Q3h,R3h,A3)
 
 Q4h,R4h = QR_con_HH(A4)
 check_QR(Q4h,R4h,A4)
+# --- TESTS PARA calculaQR ---
+Q2c,R2c = calculaQR(A2,metodo='RH')
+check_QR(Q2c,R2c,A2)
+
+Q3c,R3c = calculaQR(A3,metodo='GS')
+check_QR(Q3c,R3c,A3)
+
+Q4c,R4c = calculaQR(A4,metodo='RH')
+check_QR(Q4c,R4c,A4)
