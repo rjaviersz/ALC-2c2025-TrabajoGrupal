@@ -17,8 +17,30 @@ def metpot2k(A, tol=1e-15, K=1000):
     n = A.shape[0]
     v = np.random.rand(n) #vector aleatorio de n elementos
     vv = calcularAx(A, calcularAx(A, v)) 
-    
-    
+    e = filaxColumna(vv, v)   # es un prod interno
+    k_iter = 0
+    while ( abs(e-1) > tol and k_iter < K ):
+        v = vv
+        if norma(v, 2) > 0 :
+            v = v / norma(v, 2)   # normalizo
+        else :
+            v = 0
+        vv = calcularAx(A, calcularAx(A, v))
+        if norma(vv, 2) > 0 :
+            vv = vv / norma(vv, 2)  # normnalizo
+        else :
+            vv = 0       
+        e = filaxColumna(vv, v) # la idea es que en algun momento 
+        # esto de 1 o muy cercano a 1. 
+        # Esto quiere decir que v y vv son el mismo vector
+        # v es el vector de la iteracion anterior y vv el nuevo 
+        # si son el mismo o casi identicos, finalizo el ciclo y ese es el avec
+        
+        k_iter = k_iter+1
+    l = filaxColumna(vv,(calcularAx(A, vv))) # es el autovalor de este avec
+    e = e-1
+    return vv, l, k_iter
+
     
 
 def diagRH(A, tol=1e-15, K=1000):
@@ -40,6 +62,21 @@ def calcularAx(A, x):
             suma = suma + A[fila,columna]*x[columna]
         b[fila] = suma
     return b
+
+def filaxColumna(fila, columna):   # es lo mismo que hacer producto interno
+    n = fila.size
+    suma = 0 
+    for i in range(n) :
+        suma = suma + (fila[i]*columna[i])
+    return suma
+
+def traspuesta(A): 
+    n, m = A.shape
+    At = np.zeros((m, n))  # matriz de retorno donde ire cambiando valores
+    for columna in range(m):
+        for fila in range(n):
+            At[columna, fila] = A[fila, columna]
+    return At
 
 def normaExacta(A, p=[1, 'inf']):
     """
