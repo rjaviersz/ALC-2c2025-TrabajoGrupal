@@ -5,7 +5,7 @@ def norma(x,p):
     """
     Calcula la norma p del vector x sin np.linalg.norm
     """
-    x = np.array(x)
+    x = np.array()
     if p == 1:
         for i in range(len(x)):
             x[i] = abs(x[i])
