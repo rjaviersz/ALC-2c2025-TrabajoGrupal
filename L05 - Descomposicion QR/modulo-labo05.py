@@ -142,17 +142,13 @@ def suma_vectorial(x):
         
     return acumulador
 
-def norma_2_sin_modificar(x):
-    norma_sq = suma_vectorial(x**2)
-    return np.sqrt(norma_sq)
-
 def calcula_v_beta(x):
     """
     Calcula el vector de Householder (v) y el escalar beta.
     """
     
     # 1. Cálculo de alpha (con estabilidad)
-    norma_x = norma_2_sin_modificar(x)
+    norma_x = norma(x,2)
     x1 = x[0]
     
     # Aplicamos la fórmula de estabilidad: alpha = -sign(x1) * ||x||
