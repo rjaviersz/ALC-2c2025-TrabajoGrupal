@@ -2,25 +2,35 @@ import numpy as np
 
 # BORRAR AL JUNTAR LOS MODULOS
 def norma(x,p):
-    """
-    Calcula la norma p del vector x sin np.linalg.norm
-    """
-    x = np.array(x)
     if p == 1:
-        for i in range(len(x)):
-            x[i] = abs(x[i])
-        return sum(x)
-    elif p == 2:
-        for i in range(len(x)):
-            x[i] = x[i]**2
-        return np.sqrt(sum(x))
-    elif p == "inf":
-        for i in range(len(x)):
-            x[i] = abs(x[i])
-        return max(x)
-    else:
-        raise ValueError("p debe ser 1, 2 o np.inf")
+        suma = 0
+        for elemento in x:
+            suma += abs(elemento)
+        return suma
     
+    elif p == 2:
+        suma = 0
+        for elemento in x:
+            suma += elemento**2
+        return np.sqrt(suma)
+        
+    elif p == 'inf':
+        # Para la norma infinita, encontramos el máximo absoluto 
+        return max_abs(x)
+    else: 
+        # caso gral para cualquier p positivo
+        suma=0
+        for elemento in x:
+            suma+=abs(elemento)**p
+        res = suma **(1/p)
+        return res
+    
+def max_abs(x):
+    max_val=abs(x[0])
+    for i in range(1,len(x),1):
+        if abs(x[i])>=max_val:
+            max_val=abs(x[i])
+    return max_val
 ### Funciones L05-QR
 
 def QR_con_GS(A,tol=1e-12,retorna_nops=False):
@@ -179,7 +189,7 @@ def construye_H_k(v_sub, beta, m, k):
     # Insertar el vector de Householder v_sub en la posición correcta (k:)
     v_completo[k:] = v_sub 
     
-    # M = beta * v_completo * v_completo^T usando tu calcula_M
+    # M = beta * v_completo * v_completo^T usando calcula_M
     # v_completo se usa dos veces: como vector columna (v) y como vector fila (w)
     M_completa = calcula_M(beta, v_completo, v_completo) 
     
@@ -231,12 +241,11 @@ def QR_con_HH(A, tol=1e-12):
             # Actualizar R_sub in place: R_sub = R_sub - M
             A[k:, k:] -= M
         
-    # R es la matriz A modificada. Aplicar tolerancia final.
+    # R es la matriz A modificada. Se Aplica tolerancia final.
     R = A
     R[np.abs(R) < tol] = 0.0
 
     # 3. Reconstrucción de Q (Método 1: Producto Explícito Q = H0 * H1 * ...)
-    
     Q = np.eye(m) 
 
     # El bucle va hacia adelante (k=0, 1, ...)
@@ -246,7 +255,7 @@ def QR_con_HH(A, tol=1e-12):
 
         H_k = construye_H_k(v_sub, beta, m, k)
 
-        # Acumulación: Q = Q @ H_k (Usando np.dot para multiplicación matricial)
+        # Acumulación: Q = Q @ H_k 
         Q = multiplica_matrices(Q, H_k)
     return Q, R
 
@@ -258,7 +267,7 @@ def calculaQR(A,metodo='RH',tol=1e-12):
     retorna matrices Q y R calculadas con Gram Schmidt (y como tercer argumento opcional, el numero de operaciones)
     Si el metodo no esta entre las opciones, retorna None
     """
-    metodo = metodo.upper()
+    metodo = metodo.upper() #MAYUSCULAS
     
     if metodo == 'RH':
         # Retorna Q y R calculadas con Householder
