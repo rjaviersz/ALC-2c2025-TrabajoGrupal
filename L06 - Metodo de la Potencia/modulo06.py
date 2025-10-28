@@ -51,7 +51,31 @@ def diagRH(A, tol=1e-15, K=1000):
     Retorna: matriz de autovectores S y matriz de autovalores D, tal que A = S D S.T.
     Si la matriz A no es simétrica, debe retornar None.
     """
- 
+    n = A.shape[0]
+    autovec, autoval, _ = metpot2k(A, tol, K)
+    H_v1 = matriz_Householder(autovec)
+    
+    if n == 2:
+        S = H_v1
+        D = multiplicar_matrices(H_v1, multiplicar_matrices(A, traspuesta(H_v1)))
+        return S, D
+    else:
+        B = multiplicar_matrices(H_v1, multiplicar_matrices(A, traspuesta(H_v1)))
+        A2 = B[1:n,1:n]
+        S2, D2 = diagRH(A2, tol, K)
+        D = np.zeros((n,n))
+        D[0,0] = autoval
+        for i in range(1,n):
+            D[i,i] = D2[i-1,i-1]
+        S3 = np.zeros((n,n)) # S3 es la matriz con 1 en el (0,0) con ceros en el resto de la fila 1 y columna 1 y S2 en S3[1:n,1:n]
+        S3[0,0] = 1
+        for i in range(1,n):
+            for j in range(1,n):
+                S3[i,j] = S2[i-1,j-1]
+        S = multiplicar_matrices(H_v1, S3)
+        
+        return S, D
+
 # Funciones auxiliares
 def calcularAx(A, x):
     n, m = A.shape
@@ -116,6 +140,41 @@ def norma(x,p):
     else:
         raise ValueError("p debe ser 1, 2 o np.inf")
     
+def matriz_Householder(autovec):
+    """
+    Dado un autovector, devuelve la matriz de Householder asociada
+    """
+    n = autovec.shape[0]
+    I = np.eye(n)
+    e1 = np.zeros(n)
+    e1[0] = 1
+    vec_HH = e1 - autovec
+    denominador = filaxColumna(vec_HH, vec_HH) # vec_HH·vec_HH = ||vec_HH||^2
+    M = np.zeros((n,n))
+    
+    # Construcción de la matriz de Householder
+    for i in range(n):
+        for j in range(n):
+            M[i, j] = I[i, j] - 2 * vec_HH[i] * vec_HH[j] / denominador
+    return M
+
+def multiplicar_matrices(A,B):
+    """
+    Dada una matriz A y B las multiplica
+    """
+    n, m = A.shape
+    m2, p = B.shape
+    
+    AB = np.zeros((n,p))
+    for i in range(n):
+        for j in range(p):
+            suma = 0
+            for k in range(m):
+                suma += A[i,k] * B[k,j]
+            AB[i,j] = suma
+    
+    return AB
+
 #### TESTEOS
 # Tests metpot2k
 
@@ -182,6 +241,51 @@ for i in range(100):
     if e < 1e-5: 
         exitos += 1
 assert exitos >= 95
+
+
+#### TESTEOS
+# Tests diagRH
+
+def rand_matriz_simetrica(n):
+    A = np.random.random((n, n))
+    for i in range(n):
+        for j in range(n):
+            A[i,j] = A[j,i]
+    return A
+
+TAMANIO = 5
+# c) i
+exitos = 0
+for i in range(100):
+    A = rand_matriz_simetrica(TAMANIO) #podemos ir cambiando el tamaño
+    S,D = diagRH(A,tol=1e-15,K=1e5)
+    SDS_t = multiplicar_matrices(S, multiplicar_matrices(D, traspuesta(S)))
+    e = normaExacta(SDS_t - A, p='inf')
+    if e < 1e-5:
+        exitos += 1
+assert exitos >= 95
+    
+#c) ii
+suma = 0
+for i in range(100):
+    A = rand_matriz_simetrica(TAMANIO)
+    autovals = np.linalg.eigvalsh(A)
+    S,D = diagRH(A,tol=1e-15,K=1e5)
+    for i in range(TAMANIO):
+        suma += abs(D[i,i]) - abs(autovals[i])
+assert suma < 1e-15
+
+# d)
+N = 10
+tols = [1e-5, 1e-10, 1e-15]
+for t in tols:
+    for i in range(10):
+        A = rand_matriz_simetrica(N)
+        S,D = diagRH(A,tol=t,K=1e5)
+        norma_inf = normaExacta(multiplicar_matrices(S, multiplicar_matrices(D, traspuesta(S))) - A, p='inf')
+        
+
+
 
 
 # =============================================================================
@@ -255,6 +359,5 @@ assert exitos >= 95
 #     if e < 1e-5: 
 #         exitos += 1
 # assert exitos >= 95
-
 
 
