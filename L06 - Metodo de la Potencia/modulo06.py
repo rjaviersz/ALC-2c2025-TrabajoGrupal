@@ -278,12 +278,14 @@ assert suma < 1e-15
 # d)
 N = 10
 tols = [1e-5, 1e-10, 1e-15]
+errores = []
 for t in tols:
     for i in range(10):
         A = rand_matriz_simetrica(N)
         S,D = diagRH(A,tol=t,K=1e5)
         norma_inf = normaExacta(multiplicar_matrices(S, multiplicar_matrices(D, traspuesta(S))) - A, p='inf')
-        
+        errores.append((t, norma_inf))
+# print(errores)  # Descomentar para ver los errores obtenidos
 
 
 
