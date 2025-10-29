@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 29 01:13:54 2025
+
+@author: rjavi
+"""
+
 import numpy as np
 
 def transiciones_al_azar_continuas(n):
@@ -10,13 +17,8 @@ def transiciones_al_azar_continuas(n):
         A[::,columna] = A[::,columna] / norma(A[::,columna],1)
     return A
 
-<<<<<<< HEAD
-
 
 def transiciones_al_azar_uniformes(n,thres):
-=======
-def crea_rala(listado, m_filas, n_columnas, tol=1e-15):
->>>>>>> 30abf3349c7db0125ac74c2f991b0451c1caf225
     """
     n la cantidad de filas (columnas) de la matriz de transición.
     thres probabilidad de que una entrada sea distinta de cero.
@@ -25,15 +27,6 @@ def crea_rala(listado, m_filas, n_columnas, tol=1e-15):
     Todos los elementos de la columna $j$ son iguales 
     (a 1 sobre el número de elementos distintos de cero en la columna).
     """
-    if len(listado) == 0:
-        return [{}, (m_filas, n_columnas)]
-    
-    diccionario = {}
-    for i in range(len(listado[0])):
-        if abs(listado[2][i]) >= tol:
-            diccionario[(listado[0][i], listado[1][i])] = listado[2][i]
-    
-    return [diccionario, (m_filas, n_columnas)]
 
     A = np.random.rand(n,n)
     for columna in range(n):
@@ -56,25 +49,30 @@ def nucleo(A,tol=1e-15):
     Calcula el nucleo de la matriz A diagonalizando la matriz traspuesta(A) * A (* la multiplicacion matricial), usando el medodo diagRH. El nucleo corresponde a los autovectores de autovalor con modulo <= tol.
     Retorna los autovectores en cuestion, como una matriz de n x k, con k el numero de autovectores en el nucleo.
     """
-    raise NotImplementedError("Implementar nucleo")
 
-def crea_rala(listado,m_filas,n_columnas,tol=1e-15):
+
+def crea_rala(listado, m_filas, n_columnas, tol=1e-15):
     """
     Recibe una lista listado, con tres elementos: lista con indices i, lista con indices j, y lista con valores A_ij de la matriz A. Tambien las dimensiones de la matriz a traves de m_filas y n_columnas. Los elementos menores a tol se descartan.
     Idealmente, el listado debe incluir unicamente posiciones correspondientes a valores distintos de cero. Retorna una lista con:
     - Diccionario {(i,j):A_ij} que representa los elementos no nulos de la matriz A. Los elementos con modulo menor a tol deben descartarse por default. 
     - Tupla (m_filas,n_columnas) que permita conocer las dimensiones de la matriz.
     """
-    raise NotImplementedError("Implementar crea_rala")
+    if len(listado) == 0:
+        return [{}, (m_filas, n_columnas)]
+    
+    diccionario = {}
+    for i in range(len(listado[0])):
+        if abs(listado[2][i]) >= tol:
+            diccionario[(listado[0][i], listado[1][i])] = listado[2][i]
+    
+    return [diccionario, (m_filas, n_columnas)]
 
 def multiplica_rala_vector(A,v):
     """
     Recibe una matriz rala creada con crea_rala y un vector v. 
     Retorna un vector w resultado de multiplicar A con v
     """
-<<<<<<< HEAD
-    raise NotImplementedError("Implementar multiplica_rala_vector")
-=======
     matrix_A = np.zeros((A[1][0], A[1][1]))
     for (i, j), value in A[0].items():
         matrix_A[i, j] = value
@@ -84,8 +82,29 @@ def multiplica_rala_vector(A,v):
     return w
 
 
-### FUNCIONES AUXILIARES 
-
+# =============================================================================
+# # Funciones auxiliares
+# =============================================================================
+def norma(x,p):
+    """
+    Calcula la norma p del vector x sin np.linalg.norm
+    """
+    x = np.array(x)
+    if p == 1:
+        for i in range(len(x)):
+            x[i] = abs(x[i])
+        return sum(x)
+    elif p == 2:
+        for i in range(len(x)):
+            x[i] = x[i]**2
+        return np.sqrt(sum(x))
+    elif p == "inf":
+        for i in range(len(x)):
+            x[i] = abs(x[i])
+        return max(x)
+    else:
+        raise ValueError("p debe ser 1, 2 o np.inf")
+        
 def matriz_por_vector(A, v):
     """
     Recibe una matriz A y un vector v.
@@ -98,54 +117,6 @@ def matriz_por_vector(A, v):
             suma += A[i,j] * v[j]
         w[i] = suma
     return w
-    
-
-
-# =============================================================================
-#                         # Test L06-metpot2k, Aval
-# =============================================================================
-
-
-#### TESTEOS
-# Tests metpot2k
-
-# S = np.vstack([
-#     np.array([2,1,0])/np.sqrt(5),
-#     np.array([-1,2,5])/np.sqrt(30),
-#     np.array([1,-2,1])/np.sqrt(6)
-#               ]).T
-
-# # Pedimos que pase el 95% de los casos
-# exitos = 0
-# for i in range(100):
-#     D = np.diag(np.random.random(3)+1)*100
-#     A = S@D@S.T
-#     v,l,_ = metpot2k(A,1e-15,1e5)
-#     if np.abs(l - np.max(D))< 1e-8:
-#         exitos += 1
-# assert exitos > 95
-
-
-# #Test con HH
-# exitos = 0
-# for i in range(100):
-#     v = np.random.rand(9)
-#     #v = np.abs(v)
-#     #v = (-1) * v
-#     ixv = np.argsort(-np.abs(v))
-#     D = np.diag(v[ixv])
-#     I = np.eye(9)
-#     H = I - 2*np.outer(v.T, v)/(np.linalg.norm(v)**2)   #matriz de HouseHolder
-
-#     A = H@D@H.T
-#     v,l,_ = metpot2k(A, 1e-15, 1e5)
-#     #max_eigen = abs(D[0][0])
-#     if abs(l - D[0,0]) < 1e-8:         
-#         exitos +=1
-# assert exitos > 95
->>>>>>> 30abf3349c7db0125ac74c2f991b0451c1caf225
-
-
 
 def es_markov(T,tol=1e-6):
     """
@@ -197,45 +168,6 @@ def esNucleo(A,S,tol=1e-5):
     return True
 
 
-# Funciones auxiliares
-def traspuesta(A): 
-    n, m = A.shape
-    At = np.zeros((m, n))  # matriz de retorno donde ire cambiando valores
-    for columna in range(m):
-        for fila in range(n):
-            At[columna, fila] = A[fila, columna]
-    return At
-
-def norma(x,p):
-    """
-    Calcula la norma p del vector x sin np.linalg.norm
-    """
-    x = np.array(x)
-    if p == 1:
-        for i in range(len(x)):
-            x[i] = abs(x[i])
-        return sum(x)
-    elif p == 2:
-        for i in range(len(x)):
-            x[i] = x[i]**2
-        return np.sqrt(sum(x))
-    elif p == "inf":
-        for i in range(len(x)):
-            x[i] = abs(x[i])
-        return max(x)
-    else:
-        raise ValueError("p debe ser 1, 2 o np.inf")
-        
-def normaliza(X, p):
-    """
-    Recibe, una lista de vectores no vacio, y un escalar p.
-    Devuelve una lista donde cada elemento corresponde a normalizar los elementos de X con la norma p.
-    """
-    for i in range(len(X)):
-        X[i] = X[i]/norma(X[i],p)
-    return X
-
-
 
 ## TESTS
 # transiciones_al_azar_continuas
@@ -274,54 +206,54 @@ for i in range(1,100):
 # v_gen = v_gen / np.linalg.norm(v_gen)
 # assert np.allclose(v, v_gen) or np.allclose(v, -v_gen), msg
 
-# # crea rala
-# listado = [[0,17],[3,4],[0.5,0.25]]
-# A_rala_dict, dims = crea_rala(listado,32,89)
-# assert dims == (32,89), "crea_rala fallo en dimensiones"
-# assert A_rala_dict[(0,3)] == 0.5, "crea_rala fallo"
-# assert A_rala_dict[(17,4)] == 0.25, "crea_rala fallo"
-# assert len(A_rala_dict) == 2, "crea_rala fallo en cantidad de elementos"
+# crea rala
+listado = [[0,17],[3,4],[0.5,0.25]]
+A_rala_dict, dims = crea_rala(listado,32,89)
+assert dims == (32,89), "crea_rala fallo en dimensiones"
+assert A_rala_dict[(0,3)] == 0.5, "crea_rala fallo"
+assert A_rala_dict[(17,4)] == 0.25, "crea_rala fallo"
+assert len(A_rala_dict) == 2, "crea_rala fallo en cantidad de elementos"
 
-# listado = [[32,16,5],[3,4,7],[7,0.5,0.25]]
-# A_rala_dict, dims = crea_rala(listado,50,50)
-# assert dims == (50,50), "crea_rala fallo en dimensiones con tol"
-# assert A_rala_dict.get((32,3)) == 7
-# assert A_rala_dict[(16,4)] == 0.5
-# assert A_rala_dict[(5,7)] == 0.25
+listado = [[32,16,5],[3,4,7],[7,0.5,0.25]]
+A_rala_dict, dims = crea_rala(listado,50,50)
+assert dims == (50,50), "crea_rala fallo en dimensiones con tol"
+assert A_rala_dict.get((32,3)) == 7
+assert A_rala_dict[(16,4)] == 0.5
+assert A_rala_dict[(5,7)] == 0.25
 
-# listado = [[1,2,3],[4,5,6],[1e-20,0.5,0.25]]
-# A_rala_dict, dims = crea_rala(listado,10,10)
-# assert dims == (10,10), "crea_rala fallo en dimensiones con tol"
-# assert (1,4) not in A_rala_dict
-# assert A_rala_dict[(2,5)] == 0.5
-# assert A_rala_dict[(3,6)] == 0.25
-# assert len(A_rala_dict) == 2
+listado = [[1,2,3],[4,5,6],[1e-20,0.5,0.25]]
+A_rala_dict, dims = crea_rala(listado,10,10)
+assert dims == (10,10), "crea_rala fallo en dimensiones con tol"
+assert (1,4) not in A_rala_dict
+assert A_rala_dict[(2,5)] == 0.5
+assert A_rala_dict[(3,6)] == 0.25
+assert len(A_rala_dict) == 2
 
-# # caso borde: lista vacia. Esto es una matriz de 0s
-# listado = []
-# A_rala_dict, dims = crea_rala(listado,10,10)
-# assert dims == (10,10), "crea_rala fallo en dimensiones con lista vacia"
-# assert len(A_rala_dict) == 0, "crea_rala fallo en cantidad de elementos con lista vacia"
+# caso borde: lista vacia. Esto es una matriz de 0s
+listado = []
+A_rala_dict, dims = crea_rala(listado,10,10)
+assert dims == (10,10), "crea_rala fallo en dimensiones con lista vacia"
+assert len(A_rala_dict) == 0, "crea_rala fallo en cantidad de elementos con lista vacia"
 
-# # multiplica rala vector
-# listado = [[0,1,2],[0,1,2],[1,2,3]]
-# A_rala = crea_rala(listado,3,3)
-# v = np.random.random(3)
-# v = v / np.linalg.norm(v)
-# res = multiplica_rala_vector(A_rala,v)
-# A = np.array([[1,0,0],[0,2,0],[0,0,3]])
-# res_esperado = A @ v
-# assert np.allclose(res,res_esperado), "multiplica_rala_vector fallo"
+# multiplica rala vector
+listado = [[0,1,2],[0,1,2],[1,2,3]]
+A_rala = crea_rala(listado,3,3)
+v = np.random.random(3)
+v = v / np.linalg.norm(v)
+res = multiplica_rala_vector(A_rala,v)
+A = np.array([[1,0,0],[0,2,0],[0,0,3]])
+res_esperado = A @ v
+assert np.allclose(res,res_esperado), "multiplica_rala_vector fallo"
 
-# A = np.random.random((5,5))
-# A = A * (A > 0.5) 
-# listado = [[],[],[]]
-# for i in range(5):
-#     for j in range(5):
-#         listado[0].append(i)
-#         listado[1].append(j)
-#         listado[2].append(A[i,j])
+A = np.random.random((5,5))
+A = A * (A > 0.5) 
+listado = [[],[],[]]
+for i in range(5):
+    for j in range(5):
+        listado[0].append(i)
+        listado[1].append(j)
+        listado[2].append(A[i,j])
         
-# A_rala = crea_rala(listado,5,5)
-# v = np.random.random(5)
-# assert np.allclose(multiplica_rala_vector(A_rala,v), A @ v)
+A_rala = crea_rala(listado,5,5)
+v = np.random.random(5)
+assert np.allclose(multiplica_rala_vector(A_rala,v), A @ v)
