@@ -35,7 +35,6 @@ def nucleo(A, tol=1e-15):
     autovectores en el núcleo.
     """
 
-
 def crea_rala(listado, m_filas, n_columnas, tol=1e-15):
     """
     Recibe una lista listado, con tres elementos: lista con índices i, lista con índices
@@ -47,12 +46,45 @@ def crea_rala(listado, m_filas, n_columnas, tol=1e-15):
       elementos con módulo menor a tol deben descartarse por default.
     - Tupla (m_filas, n_columnas) que permita conocer las dimensiones de la matriz.
     """
+    if len(listado) == 0:
+        return [{}, (m_filas, n_columnas)]
+    
+    diccionario = {}
+    for i in range(len(listado[0])):
+        if abs(listado[2][i]) >= tol:
+            diccionario[(listado[0][i], listado[1][i])] = listado[2][i]
+    
+    return [diccionario, (m_filas, n_columnas)]
 
 def multiplica_rala_vector(A, v):
     """
     Recibe una matriz rala creada con crea_rala y un vector v.
     Retorna un vector w resultado de multiplicar A con v
     """
+    matrix_A = np.zeros((A[1][0], A[1][1]))
+    for (i, j), value in A[0].items():
+        matrix_A[i, j] = value
+
+    w = matriz_por_vector(matrix_A, v)
+
+    return w
+
+
+### FUNCIONES AUXILIARES 
+
+def matriz_por_vector(A, v):
+    """
+    Recibe una matriz A y un vector v.
+    Retorna un vector w resultado de multiplicar A con v
+    """
+    w = np.zeros(A.shape[0])
+    for i in range(A.shape[0]):
+        suma = 0
+        for j in range(A.shape[1]):
+            suma += A[i,j] * v[j]
+        w[i] = suma
+    return w
+    
 
 
 # =============================================================================
