@@ -10,9 +10,13 @@ def transiciones_al_azar_continuas(n):
         A[::,columna] = A[::,columna] / norma(A[::,columna],1)
     return A
 
+<<<<<<< HEAD
 
 
 def transiciones_al_azar_uniformes(n,thres):
+=======
+def crea_rala(listado, m_filas, n_columnas, tol=1e-15):
+>>>>>>> 30abf3349c7db0125ac74c2f991b0451c1caf225
     """
     n la cantidad de filas (columnas) de la matriz de transición.
     thres probabilidad de que una entrada sea distinta de cero.
@@ -21,6 +25,15 @@ def transiciones_al_azar_uniformes(n,thres):
     Todos los elementos de la columna $j$ son iguales 
     (a 1 sobre el número de elementos distintos de cero en la columna).
     """
+    if len(listado) == 0:
+        return [{}, (m_filas, n_columnas)]
+    
+    diccionario = {}
+    for i in range(len(listado[0])):
+        if abs(listado[2][i]) >= tol:
+            diccionario[(listado[0][i], listado[1][i])] = listado[2][i]
+    
+    return [diccionario, (m_filas, n_columnas)]
 
     A = np.random.rand(n,n)
     for columna in range(n):
@@ -59,7 +72,78 @@ def multiplica_rala_vector(A,v):
     Recibe una matriz rala creada con crea_rala y un vector v. 
     Retorna un vector w resultado de multiplicar A con v
     """
+<<<<<<< HEAD
     raise NotImplementedError("Implementar multiplica_rala_vector")
+=======
+    matrix_A = np.zeros((A[1][0], A[1][1]))
+    for (i, j), value in A[0].items():
+        matrix_A[i, j] = value
+
+    w = matriz_por_vector(matrix_A, v)
+
+    return w
+
+
+### FUNCIONES AUXILIARES 
+
+def matriz_por_vector(A, v):
+    """
+    Recibe una matriz A y un vector v.
+    Retorna un vector w resultado de multiplicar A con v
+    """
+    w = np.zeros(A.shape[0])
+    for i in range(A.shape[0]):
+        suma = 0
+        for j in range(A.shape[1]):
+            suma += A[i,j] * v[j]
+        w[i] = suma
+    return w
+    
+
+
+# =============================================================================
+#                         # Test L06-metpot2k, Aval
+# =============================================================================
+
+
+#### TESTEOS
+# Tests metpot2k
+
+# S = np.vstack([
+#     np.array([2,1,0])/np.sqrt(5),
+#     np.array([-1,2,5])/np.sqrt(30),
+#     np.array([1,-2,1])/np.sqrt(6)
+#               ]).T
+
+# # Pedimos que pase el 95% de los casos
+# exitos = 0
+# for i in range(100):
+#     D = np.diag(np.random.random(3)+1)*100
+#     A = S@D@S.T
+#     v,l,_ = metpot2k(A,1e-15,1e5)
+#     if np.abs(l - np.max(D))< 1e-8:
+#         exitos += 1
+# assert exitos > 95
+
+
+# #Test con HH
+# exitos = 0
+# for i in range(100):
+#     v = np.random.rand(9)
+#     #v = np.abs(v)
+#     #v = (-1) * v
+#     ixv = np.argsort(-np.abs(v))
+#     D = np.diag(v[ixv])
+#     I = np.eye(9)
+#     H = I - 2*np.outer(v.T, v)/(np.linalg.norm(v)**2)   #matriz de HouseHolder
+
+#     A = H@D@H.T
+#     v,l,_ = metpot2k(A, 1e-15, 1e5)
+#     #max_eigen = abs(D[0][0])
+#     if abs(l - D[0,0]) < 1e-8:         
+#         exitos +=1
+# assert exitos > 95
+>>>>>>> 30abf3349c7db0125ac74c2f991b0451c1caf225
 
 
 
